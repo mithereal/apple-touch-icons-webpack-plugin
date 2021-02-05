@@ -1,0 +1,33 @@
+{
+  "name": "apple-touch-icons-webpack-plugin",
+  "version": "1.0.0",
+  "description": "a webpack plugin for automatically creating apple touch icons and launch screens",
+  "license": "MIT",
+  "repository": "mithereal/apple-touch-icons-webpack-plugin",
+  "author": "Jason Clark <mithereal@gmail.com>",
+  "homepage": "https://github.com/mithereal/apple-touch-icons-webpack-plugin",
+  "bugs": "https://github.com/mithereal/apple-touch-icons-webpack-plugin/issues",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node bin/bundle.js ",
+    "build": "webpack "
+  },
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "imagemagick-convert": "^1.0.3",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "webpack": "4.41.0",
+    "webpack-cli": "3.3.9"
+  },
+  "keywords": [
+    "apple-touch-icons",
+    "apple-touch",
+    "apple",
+    "apple-icons",
+    "ipad-icons",
+    "apple-launch-screen",
+    "launch-screen"
+  ]
+}

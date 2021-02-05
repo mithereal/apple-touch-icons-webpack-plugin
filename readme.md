@@ -20,11 +20,12 @@ Update plugins array in webpack.config.js
 // import the plugin
 // *sizes is a list ie. [[h,w],[h,w],[h,w,]] 
 // *launch_screen_sizes is a list ie. [[h,w],[h,w]] that is matched to the launch_screen option index
+// icon and launch_screen are optional defaults to see below
 const AppleTouchIconsPlugin = require('apple-touch-icons-webpack-plugin')
 
 options = {
-    icon: "./example/assets/touch.png",
-    launch_screen: ["./example/assets/launch_screen_portrait.png","./example/assets/launch_screen_landscape.png"],
+    icon: "apple-touch-icon.png",
+    launch_screen: ["launch_screen_portrait.png","launch_screen_landscape.png"],
     source: "./example/assets/images",
     icon_sizes: [[57, 57],[72, 72],[76, 76],[114, 114],[120, 120],[152, 152],[167, 167],[180, 180], [1024,1024]],
     launch_screen_sizes: [[481, 1024],[481, 1024]],

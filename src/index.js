@@ -4,7 +4,7 @@ const utils = require('./utils')
 const imagemagick = require('imagemagick-convert')
 
 const default_image_icon = "apple-touch-icon.png"
-const default_launch_screens = ["ipad-landscape.png", "pad-portrait.png"]
+const default_launch_screens = ["launch_screen_portrait.png","launch_screen_landscape.png"]
 
 class AppleTouchIconsPlugin {
 
@@ -148,8 +148,6 @@ class AppleTouchIconsPlugin {
 		}
 
 		if(this.launch_screen == null) {
-
-			utils.logger.info(`Found ${files.length} image files`)
 
 			for (const file of files) {
 

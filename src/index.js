@@ -168,7 +168,6 @@ class AppleTouchIconsPlugin {
 
 				const img_files = default_launch_screens.map(file => this.context + "/" + file);
 
-				///process launch screen is bad
 				if(img_files.includes(file)){
 					let result = this.processScreen(compilation, this.context, file, options)
 				}

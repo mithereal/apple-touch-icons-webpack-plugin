@@ -23,7 +23,7 @@ Update plugins array in webpack.config.js
 // `icon` and `launch_screen` are optional defaults to see below, ie. if options are null 
 // "apple-touch-icon.png", "launch_screen_portrait.png","launch_screen_landscape.png" are expected to be somewhere in the path
 // `destination` is relative to `output.path` in webpack configuration.
-
+// resize can be fit, fill or crop (crop resizes then crops the image)
 const AppleTouchIconsPlugin = require('apple-touch-icons-webpack-plugin')
 
 options = {

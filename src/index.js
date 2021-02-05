@@ -63,13 +63,22 @@ class AppleTouchIconsPlugin {
 		this.process = this.process.bind(this)
 	}
 
-	writeFile(path, data) {
+	writeFile(context, filename, data, size) {
 
-		fs.writeFile(path, data, (err) => {
+		let name =  filename.split('.')[0];
+		let ext =  filename.split('.').pop();
+
+		const [height, ...width] = size
+
+		const new_file_path = name + "-" + height + "x" + width + "." + ext
+
+		let destinationPath = this.destination ? path.join(this.destination, new_file_path) : new_file_path
+
+		fs.writeFile(destinationPath, data, (err) => {
 			if (err)
 				console.log(err);
 			else {
-				utils.logger.info(`Successfully Exported ${path}`)
+				utils.logger.info(`Successfully Exported ${destinationPath}`)
 			}
 		});
 		return null;
@@ -115,11 +124,9 @@ class AppleTouchIconsPlugin {
 
 			let that = this
 
-			let destinationPath = this.destination ? path.join(this.destination, filename) : filename
-
 			options.icon_sizes.forEach( function(size) {
 				let image_data = that.processImage(compilation, context, filename, size,options)
-				let reply = that.writeFile(image_data, destinationPath)
+				let reply = that.writeFile(context, image_data, filename, size)
 			});
 
 		return reply
@@ -134,7 +141,7 @@ class AppleTouchIconsPlugin {
 
 			options.launch_screen_sizes.forEach( function(size) {
 				let image_data = that.processImage(compilation, context, filename, size,options)
-				let reply = that.writeFile(image_data, destinationPath)
+				let reply = that.writeFile(context, image_data, filename, size)
 			});
 
 		return reply

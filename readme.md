@@ -32,7 +32,8 @@ options = {
     source: "./example/assets/images",
     icon_sizes: [[57, 57],[72, 72],[76, 76],[114, 114],[120, 120],[152, 152],[167, 167],[180, 180], [1024,1024]],
     launch_screen_sizes: [[481, 1024],[481, 1024]],
-    destination: "../priv/images"
+    destination: "../priv/images", 
+    resize: "scale"
 };
 
 module.exports = {

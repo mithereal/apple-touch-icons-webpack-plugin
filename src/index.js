@@ -124,6 +124,21 @@ class AppleTouchIconsPlugin {
 
 		return reply
 	}
+
+	processScreen(compilation, context, filename, options) {
+		let reply;
+
+			let that = this
+
+			let destinationPath = this.destination ? path.join(this.destination, filename) : filename
+
+			options.launch_screen_sizes.forEach( function(size) {
+				let image_data = that.processImage(compilation, context, filename, size,options)
+				let reply = that.writeFile(image_data, destinationPath)
+			});
+
+		return reply
+	}
 	process(compilation, callback) {
 		const { context } = this.compiler.options
 		this.context = path.join(context, this.source)
@@ -153,12 +168,13 @@ class AppleTouchIconsPlugin {
 
 				const img_files = default_launch_screens.map(file => this.context + "/" + file);
 
+				///process launch screen is bad
 				if(img_files.includes(file)){
-					let result = this.processFile(compilation, this.context, file, options)
+					let result = this.processScreen(compilation, this.context, file, options)
 				}
 			}
 		}else{
-			let result = this.processFile(compilation, this.context, this.launch_screen, options)
+			let result = this.processScreen(compilation, this.context, this.launch_screen, options)
 		}
 
 		callback()

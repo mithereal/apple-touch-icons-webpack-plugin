@@ -5,6 +5,7 @@ const imagemagick = require('imagemagick-convert')
 
 const default_image_icon = "apple-touch-icon.png"
 const default_launch_screens = ["launch_screen_portrait.png","launch_screen_landscape.png"]
+const default_image_ipad = "ipad.png"
 
 class AppleTouchIconsPlugin {
 
@@ -14,10 +15,12 @@ class AppleTouchIconsPlugin {
 		if (typeof(config) == "undefined"){
 			this.icon = null
 			this.launch_screen = null
+			this.ipad = null
 			this.source = ""
 			this.resize = "crop"
-			this.icon_sizes = [[57, 57],[72, 72],[76, 76],[114, 114],[120, 120],[152, 152],[167, 167],[180, 180], [1024,1024]]
-			this.launch_screen_sizes = [[481, 1024],[481, 1024]]
+			this.icon_sizes = [[57, 57],[72, 72],[76, 76],[114, 114],[120, 120],[144, 144],[152, 152],[167, 167],[180, 180], [1024,1024]]
+			this.launch_screen_sizes = [[1024,481],[1024,481]]
+			this.ipad_sizes = [[568,320],[667,375],[736,414],[812,375],[1024,768],[834,834], [1024,1024] ]
 			this.destination = ""
 		} else {
 
@@ -37,14 +40,20 @@ class AppleTouchIconsPlugin {
 				this.source = config.source
 
 			if (typeof (config.icon_sizes) == "undefined")
-				this.icon_sizes = [[57, 57], [72, 72], [76, 76], [114, 114], [120, 120], [152, 152], [167, 167], [180, 180], [1024, 1024]]
+				this.icon_sizes = [[57, 57], [72, 72], [76, 76], [114, 114], [120, 120], [144, 144],[152, 152], [167, 167], [180, 180], [1024, 1024]]
 			else
 				this.icon_sizes = config.icon_sizes
 
 			if (typeof (config.launch_screen_sizes) == "undefined")
-				this.launch_screen_sizes = [[481, 1024], [481, 1024]]  // h/w
+				this.launch_screen_sizes = [[1024,481], [1024, 481]]  // h/w
 			else
 				this.launch_screen_sizes = config.launch_screen_sizes
+
+			if (typeof (config.ipad_sizes) == "undefined")
+				this.ipad_sizes = [[568,320],[667,375],[736,414],[812,375],[1024,768],[834,834], [1024,1024] ]
+			else
+				this.ipad_sizes = config.ipad_sizes
+
 
 			if (typeof (config.destination) == "undefined")
 				this.destination = ""
@@ -132,6 +141,19 @@ class AppleTouchIconsPlugin {
 		return reply
 	}
 
+	processIpad(compilation, context, filename, options) {
+		let reply;
+
+			let that = this
+
+			options.ipad_sizes.forEach( function(size) {
+				let image_data = that.processImage(compilation, context, filename, size,options)
+				let reply = that.writeFile(context, image_data, filename, size)
+			});
+
+		return reply
+	}
+
 	processScreen(compilation, context, filename, options) {
 		let reply;
 
@@ -181,6 +203,23 @@ class AppleTouchIconsPlugin {
 			}
 		}else{
 			let result = this.processScreen(compilation, this.context, this.launch_screen, options)
+		}
+
+		if(this.ipad == null) {
+
+			for (const file of files) {
+
+				const img_file = this.context + "/" + default_image_ipad
+
+				if(file === img_file){
+					let result = this.processFile(compilation, this.context, file, options)
+				}
+
+
+			}
+		}else{
+
+			let result = this.processIpad(compilation, this.context, this.ipad,options )
 		}
 
 		callback()

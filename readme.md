@@ -45,6 +45,7 @@ new AppleTouchIconsPlugin(
 }
 
 //  minimum options
+// "apple-touch-icon.png", "launch_screen_portrait.png","launch_screen_landscape.png" are expected to be somewhere in the path
 options = {
     source: "./example/assets/images",
     destination: "../priv/images"

@@ -17,7 +17,7 @@ Note: This plugin requires Webpack **4.0.0** and above.
 Update plugins array in webpack.config.js
 
 ```javascript
-// import the plugin
+//  all options
 // *sizes is a list ie. [[h,w],[h,w],[h,w,]] 
 // `*launch_screen_sizes` is a list ie. [[h,w],[h,w]] that is matched to the `launch_screen` option index
 // `icon` and `launch_screen` are optional defaults to see below, ie. if options are null 
@@ -42,5 +42,19 @@ new AppleTouchIconsPlugin(
     options,
 )
 ]
+}
+
+//  minimum options
+options = {
+    source: "./example/assets/images",
+    destination: "../priv/images"
+};
+
+module.exports = {
+    plugins: [
+        new AppleTouchIconsPlugin(
+            options,
+        )
+    ]
 }
 ```

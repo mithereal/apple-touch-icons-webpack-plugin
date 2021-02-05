@@ -19,8 +19,10 @@ Update plugins array in webpack.config.js
 ```javascript
 // import the plugin
 // *sizes is a list ie. [[h,w],[h,w],[h,w,]] 
-// *launch_screen_sizes is a list ie. [[h,w],[h,w]] that is matched to the launch_screen option index
-// icon and launch_screen are optional defaults to see below
+// `*launch_screen_sizes` is a list ie. [[h,w],[h,w]] that is matched to the `launch_screen` option index
+// `icon` and `launch_screen` are optional defaults to see below
+// `destination` is an optional configuration, which is relative to `output.path` in webpack configuration.
+
 const AppleTouchIconsPlugin = require('apple-touch-icons-webpack-plugin')
 
 options = {
@@ -38,22 +40,5 @@ new AppleTouchIconsPlugin(
     options,
 )
 ]
-}
-```
-
-#### How to change the output destination?
-
-`destination` is an optional configuration, which is relative to `output.path` in webpack configuration.
-
-```javascript
-module.exports = {
-  plugins: [
-    new FileIncludeWebpackPlugin(
-      {
-        source: './src/templates',
-        destination: '../html',
-      },
-    )
-  ]
 }
 ```

@@ -1,3 +1,7 @@
 bin/
 node_modules/
 !/src/*
+/.idea/modules.xml
+/.idea/vcs.xml
+/.idea/webpack-plugins.iml
+/.idea/workspace.xml

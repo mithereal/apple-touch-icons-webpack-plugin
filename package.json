@@ -1,6 +1,6 @@
 {
   "name": "apple-touch-icons-webpack-plugin",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "a webpack plugin for automatically creating apple touch icons and launch screens",
   "license": "MIT",
   "repository": "mithereal/apple-touch-icons-webpack-plugin",

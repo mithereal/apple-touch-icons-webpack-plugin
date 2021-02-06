@@ -58,8 +58,9 @@ class AppleTouchIconsPlugin {
 
 	compile(compilation,filename, data, size) {
 
-		let name =  filename.split('.')[0];
-		let ext =  filename.split('.').pop();
+		const filenameWithExtension = filename.replace(/^.*[\\\/]/, '');
+		const name =  filenameWithExtension.split('.')[0];
+		const ext =  filenameWithExtension.split('.').pop();
 
 		const [height, ...width] = size
 
@@ -70,7 +71,7 @@ class AppleTouchIconsPlugin {
 			size: () => data.length
 		};
 
-		return filename;
+		return filenameWithExtension;
 	}
 
 	async processImage(filename, size, options = {resize: this.resize}) {
@@ -100,7 +101,6 @@ class AppleTouchIconsPlugin {
 			resize: options.resize,
 			format: 'PNG'
 		});
-
 
 	}
 
@@ -142,14 +142,16 @@ class AppleTouchIconsPlugin {
 
 		let assetNames = Object.keys(compilation.assets);
 
+
 		if(this.icon == null) {
 
 			assetNames.map(name => {
-				let currentAsset = compilation.assets[name];
-
-				let source = currentAsset.source()
 
 				if(name === default_image_icon){
+					let currentAsset = compilation.assets[name];
+
+					let source = currentAsset.source()
+
 					 this.processFile(compilation, source, this.options)
 				}
 
@@ -158,11 +160,12 @@ class AppleTouchIconsPlugin {
 		}else{
 
 			assetNames.map(name => {
-				let currentAsset = compilation.assets[name];
-
-				let source = currentAsset.source()
 
 				if(name === this.icon){
+					let currentAsset = compilation.assets[name];
+
+					let source = currentAsset.source()
+
 					this.processFile(compilation, source, this.options)
 				}
 
@@ -172,11 +175,12 @@ class AppleTouchIconsPlugin {
 		if(this.launch_screen == null) {
 
 			assetNames.map(name => {
-				let currentAsset = compilation.assets[name];
-
-				let source = currentAsset.source()
 
 				if(default_launch_screens.includes(name)){
+					let currentAsset = compilation.assets[name];
+
+					let source = currentAsset.source()
+
 					 this.processScreen(source, this.options)
 				}
 
@@ -185,11 +189,12 @@ class AppleTouchIconsPlugin {
 		}else{
 
 			assetNames.map(name => {
-				let currentAsset = compilation.assets[name];
-
-				let source = currentAsset.source()
 
 				if(name === this.launch_screen){
+					let currentAsset = compilation.assets[name];
+
+					let source = currentAsset.source()
+
 					 this.processScreen(compilation, source, this.options)
 				}
 
@@ -200,11 +205,12 @@ class AppleTouchIconsPlugin {
 		if(this.ipad == null) {
 
 			assetNames.map(name => {
-				let currentAsset = compilation.assets[name];
-
-				let source = currentAsset.source()
 
 				if(name === default_image_ipad){
+					let currentAsset = compilation.assets[name];
+
+					let source = currentAsset.source()
+
 					this.processIpad(compilation, source, this.options)
 				}
 
@@ -213,11 +219,12 @@ class AppleTouchIconsPlugin {
 		}else{
 
 			assetNames.map(name => {
-				let currentAsset = compilation.assets[name];
-
-				let source = currentAsset.source()
 
 				if(name === this.ipad){
+					let currentAsset = compilation.assets[name];
+
+					let source = currentAsset.source()
+
 					 this.processIpad(compilation, source, this.options)
 				}
 

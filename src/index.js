@@ -8,49 +8,22 @@ const default_image_ipad = "ipad.png"
 
 class AppleTouchIconsPlugin {
 
-	constructor(config) {
-
-		if (typeof(config) == "undefined"){
-			this.icon = null
-			this.launch_screen = null
-			this.ipad = null
-			this.resize = "crop"
-			this.icon_sizes = [[57, 57],[72, 72],[76, 76],[114, 114],[120, 120],[144, 144],[152, 152],[167, 167],[180, 180], [1024,1024]]
-			this.launch_screen_sizes = [[1024,481],[1024,481]]
-			this.ipad_sizes = [[568,320],[667,375],[736,414],[812,375],[1024,768],[834,834], [1024,1024] ]
-		} else {
-
-			if (typeof (config.icon) == "undefined")
-				this.icon = null
-			else
-				this.icon = config.icon
-
-			if (typeof (config.launch_screen) == "undefined")
-				this.launch_screen = null
-			else
-				this.launch_screen = config.launch_screen
-
-
-			if (typeof (config.icon_sizes) == "undefined")
-				this.icon_sizes = [[57, 57], [72, 72], [76, 76], [114, 114], [120, 120], [144, 144],[152, 152], [167, 167], [180, 180], [1024, 1024]]
-			else
-				this.icon_sizes = config.icon_sizes
-
-			if (typeof (config.launch_screen_sizes) == "undefined")
-				this.launch_screen_sizes = [[1024,481], [1024, 481]]  // h/w
-			else
-				this.launch_screen_sizes = config.launch_screen_sizes
-
-			if (typeof (config.ipad_sizes) == "undefined")
-				this.ipad_sizes = [[568,320],[667,375],[736,414],[812,375],[1024,768],[834,834], [1024,1024] ]
-			else
-				this.ipad_sizes = config.ipad_sizes
-
-			if (typeof (config.resize) == "undefined")
-				this.resize = 'crop'
-			else
-				this.resize = config.resize
-		}
+	constructor({
+					icon = null,
+					launch_screen = null,
+					ipad = null,
+					resize = "crop",
+					icon_sizes = [[57, 57],[72, 72],[76, 76],[114, 114],[120, 120],[144, 144],[152, 152],[167, 167],[180, 180], [1024,1024]],
+					launch_screen_sizes = [[1024,481],[1024,481]],
+					ipad_sizes = [[568,320],[667,375],[736,414],[812,375],[1024,768],[834,834], [1024,1024] ]
+				} = {}) {
+		this.icon = icon;
+		this.launch_screen = launch_screen;
+		this.ipad = ipad;
+		this.resize = resize;
+		this.icon_sizes = icon_sizes;
+		this.launch_screen_sizes = launch_screen_sizes;
+		this.ipad_sizes = ipad_sizes;
 
 		// handlers
 		this.process = this.process.bind(this)

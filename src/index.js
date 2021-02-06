@@ -1,27 +1,23 @@
-const path = require('path')
 const fs = require('fs')
-const utils = require('./utils')
 const imagemagick = require('imagemagick-convert')
 
 const default_image_icon = "apple-touch-icon.png"
-const default_launch_screens = ["launch_screen_portrait.png","launch_screen_landscape.png"]
+const default_launch_screens = ["launch-screen-portrait.png","launch-screen-landscape.png"]
 const default_image_ipad = "ipad.png"
+
 
 class AppleTouchIconsPlugin {
 
 	constructor(config) {
-		// source from the context
 
 		if (typeof(config) == "undefined"){
 			this.icon = null
 			this.launch_screen = null
 			this.ipad = null
-			this.source = ""
 			this.resize = "crop"
 			this.icon_sizes = [[57, 57],[72, 72],[76, 76],[114, 114],[120, 120],[144, 144],[152, 152],[167, 167],[180, 180], [1024,1024]]
 			this.launch_screen_sizes = [[1024,481],[1024,481]]
 			this.ipad_sizes = [[568,320],[667,375],[736,414],[812,375],[1024,768],[834,834], [1024,1024] ]
-			this.destination = ""
 		} else {
 
 			if (typeof (config.icon) == "undefined")
@@ -34,10 +30,6 @@ class AppleTouchIconsPlugin {
 			else
 				this.launch_screen = config.launch_screen
 
-			if (typeof (config.source) == "undefined")
-				this.source = ""
-			else
-				this.source = config.source
 
 			if (typeof (config.icon_sizes) == "undefined")
 				this.icon_sizes = [[57, 57], [72, 72], [76, 76], [114, 114], [120, 120], [144, 144],[152, 152], [167, 167], [180, 180], [1024, 1024]]
@@ -54,25 +46,17 @@ class AppleTouchIconsPlugin {
 			else
 				this.ipad_sizes = config.ipad_sizes
 
-
-			if (typeof (config.destination) == "undefined")
-				this.destination = ""
-			else
-				this.destination = config.destination
-
 			if (typeof (config.resize) == "undefined")
 				this.resize = 'crop'
 			else
 				this.resize = config.resize
 		}
 
-		this.context = null
-
 		// handlers
 		this.process = this.process.bind(this)
 	}
 
-	writeFile(context, filename, data, size) {
+	compile(compilation,filename, data, size) {
 
 		let name =  filename.split('.')[0];
 		let ext =  filename.split('.').pop();
@@ -81,23 +65,19 @@ class AppleTouchIconsPlugin {
 
 		const new_file_path = name + "-" + height + "x" + width + "." + ext
 
-		let destinationPath = this.destination ? path.join(this.destination, new_file_path) : new_file_path
+		compilation.assets[new_file_path] = {
+			source: () => data,
+			size: () => data.length
+		};
 
-		fs.writeFile(destinationPath, data, (err) => {
-			if (err)
-				console.log(err);
-			else {
-				utils.logger.info(`Successfully Exported ${destinationPath}`)
-			}
-		});
-		return null;
+		return filename;
 	}
 
-	async processImage(compilation, context, filename, size,options = {resize: this.resize}) {
+	async processImage(filename, size, options = {resize: this.resize}) {
 
 		let format =  filename.split('.').pop();
 
-		let srcFormat = 'PNG';
+		let srcFormat;
 
 		switch(format.toLowerCase()) {
 			case 'jpg':
@@ -110,12 +90,10 @@ class AppleTouchIconsPlugin {
 				srcFormat =  'PNG'
 		}
 
-		let path = context + "/" + filename
-
 		const [height, ...width] = size;
 
-		let imgBuffer = await imagemagick.convert({
-			srcData: fs.readFileSync(path),
+		return await imagemagick.convert({
+			srcData: fs.readFileSync(filename),
 			srcFormat: srcFormat,
 			width: width,
 			height: height,
@@ -123,103 +101,127 @@ class AppleTouchIconsPlugin {
 			format: 'PNG'
 		});
 
-		utils.logger.info(`Processing ${path}`)
 
-		return imgBuffer;
 	}
 
-	 processFile(compilation, context, filename, options) {
-		let reply;
+	processFile(compilation,filename, options) {
+
+			const that = this
+
+		return  options.icon_sizes.map(size =>  {
+				let image_data = that.processImage(filename, size,options)
+				 that.compile(compilation, image_data, filename, size)
+			});
+
+	}
+
+	processIpad(compilation, filename, options) {
 
 			let that = this
 
-			options.icon_sizes.forEach( function(size) {
-				let image_data = that.processImage(compilation, context, filename, size,options)
-				let reply = that.writeFile(context, image_data, filename, size)
+		return options.ipad_sizes.map(size =>  {
+				let image_data = that.processImage(filename, size,options)
+				 that.compile(compilation, image_data, filename, size)
 			});
 
-		return reply
+
 	}
 
-	processIpad(compilation, context, filename, options) {
-		let reply;
+	processScreen(compilation, filename, options) {
 
 			let that = this
 
-			options.ipad_sizes.forEach( function(size) {
-				let image_data = that.processImage(compilation, context, filename, size,options)
-				let reply = that.writeFile(context, image_data, filename, size)
+		return options.launch_screen_sizes.map(size =>  {
+				let image_data = that.processImage(filename, size,options)
+				 that.compile(compilation, image_data, filename, size)
 			});
 
-		return reply
 	}
 
-	processScreen(compilation, context, filename, options) {
-		let reply;
-
-			let that = this
-
-			let destinationPath = this.destination ? path.join(this.destination, filename) : filename
-
-			options.launch_screen_sizes.forEach( function(size) {
-				let image_data = that.processImage(compilation, context, filename, size,options)
-				let reply = that.writeFile(context, image_data, filename, size)
-			});
-
-		return reply
-	}
 	process(compilation, callback) {
-		const { context } = this.compiler.options
-		this.context = path.join(context, this.source)
-		const files = utils.getRequiredFiles(this.context, '')
-		const options = this.options
+
+		let assetNames = Object.keys(compilation.assets);
 
 		if(this.icon == null) {
 
-			for (const file of files) {
+			assetNames.map(name => {
+				let currentAsset = compilation.assets[name];
 
-			const img_file = this.context + "/" + default_image_icon
+				let source = currentAsset.source()
 
-				if(file === img_file){
-					let result = this.processFile(compilation, this.context, file, options)
+				if(name === default_image_icon){
+					 this.processFile(compilation, source, this.options)
 				}
 
+			});
 
-			}
 		}else{
 
-			let result = this.processFile(compilation, this.context, this.icon,options )
+			assetNames.map(name => {
+				let currentAsset = compilation.assets[name];
+
+				let source = currentAsset.source()
+
+				if(name === this.icon){
+					this.processFile(compilation, source, this.options)
+				}
+
+			});
 		}
 
 		if(this.launch_screen == null) {
 
-			for (const file of files) {
+			assetNames.map(name => {
+				let currentAsset = compilation.assets[name];
 
-				const img_files = default_launch_screens.map(file => this.context + "/" + file);
+				let source = currentAsset.source()
 
-				if(img_files.includes(file)){
-					let result = this.processScreen(compilation, this.context, file, options)
+				if(default_launch_screens.includes(name)){
+					 this.processScreen(source, this.options)
 				}
-			}
+
+			});
+
 		}else{
-			let result = this.processScreen(compilation, this.context, this.launch_screen, options)
+
+			assetNames.map(name => {
+				let currentAsset = compilation.assets[name];
+
+				let source = currentAsset.source()
+
+				if(name === this.launch_screen){
+					 this.processScreen(compilation, source, this.options)
+				}
+
+			});
+
 		}
 
 		if(this.ipad == null) {
 
-			for (const file of files) {
+			assetNames.map(name => {
+				let currentAsset = compilation.assets[name];
 
-				const img_file = this.context + "/" + default_image_ipad
+				let source = currentAsset.source()
 
-				if(file === img_file){
-					let result = this.processFile(compilation, this.context, file, options)
+				if(name === default_image_ipad){
+					this.processIpad(compilation, source, this.options)
 				}
 
+			});
 
-			}
 		}else{
 
-			let result = this.processIpad(compilation, this.context, this.ipad,options )
+			assetNames.map(name => {
+				let currentAsset = compilation.assets[name];
+
+				let source = currentAsset.source()
+
+				if(name === this.ipad){
+					 this.processIpad(compilation, source, this.options)
+				}
+
+			});
 		}
 
 		callback()

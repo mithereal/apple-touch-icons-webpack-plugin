@@ -49,7 +49,7 @@ class AppleTouchIconsPlugin {
 		return filenameWithExtension;
 	}
 
-	async processImage(compilation, filename, size, options = {resize: this.resize}) {
+	async processImage(filename, size, options = {resize: this.resize}) {
 
 		let format =  filename.split('.').pop();
 
@@ -68,7 +68,7 @@ class AppleTouchIconsPlugin {
 
 		const [height, ...width] = size;
 
-		 const image_data = await imagemagick.convert({
+		return await imagemagick.convert({
 			srcData: fs.readFileSync(filename),
 			srcFormat: srcFormat,
 			width: width,
@@ -76,11 +76,6 @@ class AppleTouchIconsPlugin {
 			resize: options.resize,
 			format: 'PNG'
 		});
-
-		this.compile(compilation, image_data, filename, size)
-
-		 return image_data;
-
 	}
 
 	processFile(compilation,filename, options) {
@@ -88,8 +83,9 @@ class AppleTouchIconsPlugin {
 			const that = this
 
 		return  options.icon_sizes.map(size =>  {
-				let image_data = that.processImage(compilation,filename, size,options)
-			});
+			that.processImage( filename, size,options).then(image_data => {
+				return this.compile(compilation, image_data, filename, size);
+			})});
 
 	}
 
@@ -98,11 +94,9 @@ class AppleTouchIconsPlugin {
 			let that = this
 
 		return options.ipad_sizes.map(size =>  {
-				let image_data = that.processImage(compilation, filename, size,options)
-
-			});
-
-
+				that.processImage( filename, size,options).then(image_data => {
+						return this.compile(compilation, image_data, filename, size);
+					})});
 	}
 
 	processScreen(compilation, filename, options) {
@@ -110,10 +104,9 @@ class AppleTouchIconsPlugin {
 			let that = this
 
 		return options.launch_screen_sizes.map(size =>  {
-				let image_data = that.processImage(compilation, filename, size,options)
-
-			});
-
+			that.processImage( filename, size,options).then(image_data => {
+				return this.compile(compilation, image_data, filename, size);
+			})});
 	}
 
 	process(compilation, callback) {
@@ -208,7 +201,6 @@ class AppleTouchIconsPlugin {
 
 			});
 		}
-
 		callback()
 	}
 
@@ -219,4 +211,3 @@ class AppleTouchIconsPlugin {
 }
 
 module.exports = AppleTouchIconsPlugin;
-

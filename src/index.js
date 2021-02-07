@@ -113,95 +113,71 @@ class AppleTouchIconsPlugin {
 
 		let assetNames = Object.keys(compilation.assets);
 
+		Promise.all(
+		assetNames.map(name => {
 
-		if(this.icon == null) {
+			if(this.icon == null) {
 
-			assetNames.map(name => {
+					if(name === default_image_icon){
+						let currentAsset = compilation.assets[name];
 
-				if(name === default_image_icon){
-					let currentAsset = compilation.assets[name];
+						let source = currentAsset.source()
 
-					let source = currentAsset.source()
+						this.processFile(compilation, source, this.options)
+					}
 
-					 this.processFile(compilation, source, this.options)
-				}
+			}else{
+					if(name === this.icon){
+						let currentAsset = compilation.assets[name];
 
-			});
+						let source = currentAsset.source()
 
-		}else{
+						this.processFile(compilation, source, this.options)
+					}
+			}
 
-			assetNames.map(name => {
-
-				if(name === this.icon){
-					let currentAsset = compilation.assets[name];
-
-					let source = currentAsset.source()
-
-					this.processFile(compilation, source, this.options)
-				}
-
-			});
-		}
-
-		if(this.launch_screen == null) {
-
-			assetNames.map(name => {
-
+			if(this.launch_screen == null) {
 				if(default_launch_screens.includes(name)){
 					let currentAsset = compilation.assets[name];
 
 					let source = currentAsset.source()
 
-					 this.processScreen(source, this.options)
+					this.processScreen(source, this.options)
 				}
-
-			});
-
-		}else{
-
-			assetNames.map(name => {
-
-				if(name === this.launch_screen){
+			}else {
+				if (name === this.launch_screen) {
 					let currentAsset = compilation.assets[name];
 
 					let source = currentAsset.source()
 
-					 this.processScreen(compilation, source, this.options)
+					this.processScreen(compilation, source, this.options)
 				}
+			}
 
-			});
+				if(this.ipad == null) {
+					if(name === default_image_ipad){
+						let currentAsset = compilation.assets[name];
 
-		}
+						let source = currentAsset.source()
 
-		if(this.ipad == null) {
+						this.processIpad(source, this.options)
+					}
+				}else{
+					if(name === this.ipad ){
+						let currentAsset = compilation.assets[name];
 
-			assetNames.map(name => {
+						let source = currentAsset.source()
 
-				if(name === default_image_ipad){
-					let currentAsset = compilation.assets[name];
+						this.processIpad(compilation, source, this.options)
+					}
+			}
+			return Promise.resolve(0);
+		})
+	).then(args => {
 
-					let source = currentAsset.source()
+			callback()
+		});
 
-					this.processIpad(compilation, source, this.options)
-				}
-
-			});
-
-		}else{
-
-			assetNames.map(name => {
-
-				if(name === this.ipad){
-					let currentAsset = compilation.assets[name];
-
-					let source = currentAsset.source()
-
-					 this.processIpad(compilation, source, this.options)
-				}
-
-			});
-		}
-		callback()
 	}
 
 	apply(compiler) {

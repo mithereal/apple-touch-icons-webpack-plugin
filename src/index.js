@@ -79,7 +79,7 @@ class AppleTouchIconsPlugin {
 
 		this.compile(compilation, image_data, filename, size)
 
-		 return im;
+		 return image_data;
 
 	}
 

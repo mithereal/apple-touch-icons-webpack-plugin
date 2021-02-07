@@ -39,8 +39,6 @@ class AppleTouchIconsPlugin {
 
 		const new_file_path = name + "-" + height + "x" + width + "." + ext
 
-		console.log(new_file_path)
-
 		compilation.assets[new_file_path] = {
 			source: () => data,
 			size: () => data.length

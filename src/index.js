@@ -49,7 +49,7 @@ class AppleTouchIconsPlugin {
 		return filenameWithExtension;
 	}
 
-	async processImage(filename, size, options = {resize: this.resize}) {
+	async processImage(compilation, filename, size, options = {resize: this.resize}) {
 
 		let format =  filename.split('.').pop();
 
@@ -68,7 +68,7 @@ class AppleTouchIconsPlugin {
 
 		const [height, ...width] = size;
 
-		return await imagemagick.convert({
+		 const image_data = await imagemagick.convert({
 			srcData: fs.readFileSync(filename),
 			srcFormat: srcFormat,
 			width: width,
@@ -77,6 +77,10 @@ class AppleTouchIconsPlugin {
 			format: 'PNG'
 		});
 
+		this.compile(compilation, image_data, filename, size)
+
+		 return im;
+
 	}
 
 	processFile(compilation,filename, options) {
@@ -84,8 +88,7 @@ class AppleTouchIconsPlugin {
 			const that = this
 
 		return  options.icon_sizes.map(size =>  {
-				let image_data = that.processImage(filename, size,options)
-				 that.compile(compilation, image_data, filename, size)
+				let image_data = that.processImage(compilation,filename, size,options)
 			});
 
 	}
@@ -95,8 +98,8 @@ class AppleTouchIconsPlugin {
 			let that = this
 
 		return options.ipad_sizes.map(size =>  {
-				let image_data = that.processImage(filename, size,options)
-				 that.compile(compilation, image_data, filename, size)
+				let image_data = that.processImage(compilation, filename, size,options)
+
 			});
 
 
@@ -107,8 +110,8 @@ class AppleTouchIconsPlugin {
 			let that = this
 
 		return options.launch_screen_sizes.map(size =>  {
-				let image_data = that.processImage(filename, size,options)
-				 that.compile(compilation, image_data, filename, size)
+				let image_data = that.processImage(compilation, filename, size,options)
+
 			});
 
 	}

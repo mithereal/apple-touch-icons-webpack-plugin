@@ -6,6 +6,7 @@ const default_launch_screens = ["launch-screen-portrait.png","launch-screen-land
 const default_image_ipad = "ipad.png"
 
 
+
 class AppleTouchIconsPlugin {
 
 	constructor({
@@ -48,6 +49,8 @@ class AppleTouchIconsPlugin {
 	}
 
 	async processImage(filename, size, options = {resize: this.resize}) {
+		console.log("process image")
+
 
 		let format = filename.split('.').pop();
 
@@ -67,6 +70,8 @@ class AppleTouchIconsPlugin {
 		const [height, ...width] = size;
 
 		return await new Promise(resolve => {
+
+			//get path
 			resolve( imagemagick.convert({
 				srcData: fs.readFileSync(filename),
 				srcFormat: srcFormat,
@@ -79,100 +84,97 @@ class AppleTouchIconsPlugin {
 		})
 		}
 
-	processFile(compilation, filename, options) {
+	processFile(compilation, filename, sizes) {
 
 		const that = this
 
-		return options.icon_sizes.map(size => {
-			that.processImage(filename, size, options).then(image_data => {
+		return sizes.map(size => {
+			that.processImage(filename, size, sizes).then(image_data => {
 				return this.compile(compilation, image_data, filename, size);
 			})
 		});
 
 	}
 
-	processIpad(compilation, filename, options) {
+	processIpad(compilation, filename, sizes) {
 
 		let that = this
 
-		return options.ipad_sizes.map(size => {
-			that.processImage(filename, size, options).then(image_data => {
+		return this.ipad_sizes.map(size => {
+			that.processImage(filename, size, sizes).then(image_data => {
 				return this.compile(compilation, image_data, filename, size);
 			})
 		});
 	}
 
-	processScreen(compilation, filename, options) {
+	processScreen(compilation, filename, sizes) {
 
 		let that = this
-
-		return options.launch_screen_sizes.map(size => {
-			that.processImage(filename, size, options).then(image_data => {
+console.log("processing screen")
+		return this.launch_screen_sizes.map(size => {
+			that.processImage(filename, size, sizes).then(image_data => {
 				return this.compile(compilation, image_data, filename, size);
 			})
 		});
 	}
 
 	process(compilation, callback) {
-
+		console.log("processing")
 		let assetNames = Object.keys(compilation.assets);
 
 		Promise.all(
 			assetNames.map(name => {
 
+				let filenameWithExtension = name.replace(/^.*[\\\/]/, '');
+
 				if (this.icon == null) {
 
-					if (name === default_image_icon) {
+					if (filenameWithExtension === default_image_icon) {
 						let currentAsset = compilation.assets[name];
 
-						let source = currentAsset.source()
-
-						this.processFile(compilation, source, this.options)
+						const path_to_file = name
+						this.processFile(compilation, path_to_file, this.icon_sizes)
 					}
 
 				} else {
-					if (name === this.icon) {
+
+					if (filenameWithExtension === this.icon) {
 						let currentAsset = compilation.assets[name];
 
-						let source = currentAsset.source()
-
-						this.processFile(compilation, source, this.options)
+						const path_to_file = name
+						this.processFile(compilation, path_to_file, this.icon_sizes)
 					}
 				}
 
 				if (this.launch_screen == null) {
-					if (default_launch_screens.includes(name)) {
+					if (default_launch_screens.includes(filenameWithExtension)) {
 						let currentAsset = compilation.assets[name];
 
-						let source = currentAsset.source()
-
-						this.processScreen(source, this.options)
+						const path_to_file = name
+						this.processScreen(compilation,path_to_file, this.launch_screen_sizes)
 					}
 				} else {
-					if (name === this.launch_screen) {
+					if (filenameWithExtension === this.launch_screen) {
 						let currentAsset = compilation.assets[name];
 
-						let source = currentAsset.source()
-
-						this.processScreen(compilation, source, this.options)
+						const path_to_file = name
+						this.processScreen(compilation, path_to_file, this.launch_screen_sizes)
 					}
 				}
 
 				if (this.ipad == null) {
-					if (name === default_image_ipad) {
+					if (filenameWithExtension === default_image_ipad) {
 						let currentAsset = compilation.assets[name];
 
-						let source = currentAsset.source()
-
-						this.processIpad(source, this.options)
+						const path_to_file = name
+						this.processIpad(compilation, path_to_file, this.ipad_sizes)
 					}
 				} else {
-					if (name === this.ipad) {
+					if (filenameWithExtension === this.ipad) {
 						let currentAsset = compilation.assets[name];
 
-						let source = currentAsset.source()
-
-						this.processIpad(compilation, source, this.options)
+						const path_to_file = name
+						this.processIpad(compilation, path_to_file, this.ipad_sizes)
 					}
 				}
 				return Promise.resolve(0);
@@ -186,7 +188,7 @@ class AppleTouchIconsPlugin {
 
 	apply(compiler) {
 		this.compiler = compiler
-
+console.log("compiling")
 		if (compiler.hooks) {
 			compiler.hooks.emit.tapAsync('AppleTouchIconsPlugin', this.process)
 		} else {

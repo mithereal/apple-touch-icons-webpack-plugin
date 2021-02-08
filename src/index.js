@@ -13,9 +13,9 @@ class AppleTouchIconsPlugin {
 					launch_screen = null,
 					ipad = null,
 					resize = "crop",
-					icon_sizes = [[57, 57],[72, 72],[76, 76],[114, 114],[120, 120],[144, 144],[152, 152],[167, 167],[180, 180], [1024,1024]],
-					launch_screen_sizes = [[1024,481],[1024,481]],
-					ipad_sizes = [[568,320],[667,375],[736,414],[812,375],[1024,768],[834,834], [1024,1024] ]
+					icon_sizes = [[57, 57], [72, 72], [76, 76], [114, 114], [120, 120], [144, 144], [152, 152], [167, 167], [180, 180], [1024, 1024]],
+					launch_screen_sizes = [[1024, 481], [1024, 481]],
+					ipad_sizes = [[568, 320], [667, 375], [736, 414], [812, 375], [1024, 768], [834, 834], [1024, 1024]]
 				} = {}) {
 		this.icon = icon;
 		this.launch_screen = launch_screen;
@@ -29,11 +29,11 @@ class AppleTouchIconsPlugin {
 		this.process = this.process.bind(this)
 	}
 
-	compile(compilation,filename, data, size) {
+	compile(compilation, filename, data, size) {
 
 		const filenameWithExtension = filename.replace(/^.*[\\\/]/, '');
-		const name =  filenameWithExtension.split('.')[0];
-		const ext =  filenameWithExtension.split('.').pop();
+		const name = filenameWithExtension.split('.')[0];
+		const ext = filenameWithExtension.split('.').pop();
 
 		const [height, ...width] = size
 
@@ -44,67 +44,73 @@ class AppleTouchIconsPlugin {
 			size: () => data.length
 		};
 
-		return filenameWithExtension;
+		return compilation;
 	}
 
 	async processImage(filename, size, options = {resize: this.resize}) {
 
-		let format =  filename.split('.').pop();
+		let format = filename.split('.').pop();
 
 		let srcFormat;
 
-		switch(format.toLowerCase()) {
+		switch (format.toLowerCase()) {
 			case 'jpg':
-				srcFormat =  'JPEG'
+				srcFormat = 'JPEG'
 				break;
 			case 'jpeg':
-				srcFormat =  'JPEG'
+				srcFormat = 'JPEG'
 				break;
 			default:
-				srcFormat =  'PNG'
+				srcFormat = 'PNG'
 		}
 
 		const [height, ...width] = size;
 
-		return await imagemagick.convert({
-			srcData: fs.readFileSync(filename),
-			srcFormat: srcFormat,
-			width: width,
-			height: height,
-			resize: options.resize,
-			format: 'PNG'
-		});
-	}
+		return await new Promise(resolve => {
+			resolve( imagemagick.convert({
+				srcData: fs.readFileSync(filename),
+				srcFormat: srcFormat,
+				width: width,
+				height: height,
+				resize: options.resize,
+				format: 'PNG'
+			})
+			);
+		})
+		}
 
-	processFile(compilation,filename, options) {
+	processFile(compilation, filename, options) {
 
-			const that = this
+		const that = this
 
-		return  options.icon_sizes.map(size =>  {
-			that.processImage( filename, size,options).then(image_data => {
+		return options.icon_sizes.map(size => {
+			that.processImage(filename, size, options).then(image_data => {
 				return this.compile(compilation, image_data, filename, size);
-			})});
+			})
+		});
 
 	}
 
 	processIpad(compilation, filename, options) {
 
-			let that = this
+		let that = this
 
-		return options.ipad_sizes.map(size =>  {
-				that.processImage( filename, size,options).then(image_data => {
-						return this.compile(compilation, image_data, filename, size);
-					})});
+		return options.ipad_sizes.map(size => {
+			that.processImage(filename, size, options).then(image_data => {
+				return this.compile(compilation, image_data, filename, size);
+			})
+		});
 	}
 
 	processScreen(compilation, filename, options) {
 
-			let that = this
+		let that = this
 
-		return options.launch_screen_sizes.map(size =>  {
-			that.processImage( filename, size,options).then(image_data => {
+		return options.launch_screen_sizes.map(size => {
+			that.processImage(filename, size, options).then(image_data => {
 				return this.compile(compilation, image_data, filename, size);
-			})});
+			})
+		});
 	}
 
 	process(compilation, callback) {
@@ -112,11 +118,11 @@ class AppleTouchIconsPlugin {
 		let assetNames = Object.keys(compilation.assets);
 
 		Promise.all(
-		assetNames.map(name => {
+			assetNames.map(name => {
 
-			if(this.icon == null) {
+				if (this.icon == null) {
 
-					if(name === default_image_icon){
+					if (name === default_image_icon) {
 						let currentAsset = compilation.assets[name];
 
 						let source = currentAsset.source()
@@ -124,54 +130,54 @@ class AppleTouchIconsPlugin {
 						this.processFile(compilation, source, this.options)
 					}
 
-			}else{
-					if(name === this.icon){
+				} else {
+					if (name === this.icon) {
 						let currentAsset = compilation.assets[name];
 
 						let source = currentAsset.source()
 
 						this.processFile(compilation, source, this.options)
 					}
-			}
-
-			if(this.launch_screen == null) {
-				if(default_launch_screens.includes(name)){
-					let currentAsset = compilation.assets[name];
-
-					let source = currentAsset.source()
-
-					this.processScreen(source, this.options)
 				}
-			}else {
-				if (name === this.launch_screen) {
-					let currentAsset = compilation.assets[name];
 
-					let source = currentAsset.source()
+				if (this.launch_screen == null) {
+					if (default_launch_screens.includes(name)) {
+						let currentAsset = compilation.assets[name];
 
-					this.processScreen(compilation, source, this.options)
+						let source = currentAsset.source()
+
+						this.processScreen(source, this.options)
+					}
+				} else {
+					if (name === this.launch_screen) {
+						let currentAsset = compilation.assets[name];
+
+						let source = currentAsset.source()
+
+						this.processScreen(compilation, source, this.options)
+					}
 				}
-			}
 
-				if(this.ipad == null) {
-					if(name === default_image_ipad){
+				if (this.ipad == null) {
+					if (name === default_image_ipad) {
 						let currentAsset = compilation.assets[name];
 
 						let source = currentAsset.source()
 
 						this.processIpad(source, this.options)
 					}
-				}else{
-					if(name === this.ipad ){
+				} else {
+					if (name === this.ipad) {
 						let currentAsset = compilation.assets[name];
 
 						let source = currentAsset.source()
 
 						this.processIpad(compilation, source, this.options)
 					}
-			}
-			return Promise.resolve(0);
-		})
-	).then(args => {
+				}
+				return Promise.resolve(0);
+			})
+		).then(args => {
 
 			callback()
 		});
@@ -180,7 +186,13 @@ class AppleTouchIconsPlugin {
 
 	apply(compiler) {
 		this.compiler = compiler
-		compiler.hooks.emit.tapAsync('AppleTouchIconsPlugin', this.process)
+
+		if (compiler.hooks) {
+			compiler.hooks.emit.tapAsync('AppleTouchIconsPlugin', this.process)
+		} else {
+			// older versions
+			compiler.plugin('emit', this.process);
+		}
 	}
 }
 

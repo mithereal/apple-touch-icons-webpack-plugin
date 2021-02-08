@@ -32,7 +32,8 @@ options = {
     icon_sizes: [[57, 57],[72, 72],[76, 76],[114, 114],[120, 120],[152, 152],[167, 167],[180, 180], [1024,1024]],
     launch_screen_sizes: [[481, 1024],[481, 1024]],
     ipad_sizes: [[568,320],[667,375],[736,414],[812,375],[1024,768],[834,834], [1024,1024] ],
-    resize: "crop"
+    resize: "crop",
+    basepath: "absolute_path_to_assets"
 };
 
 module.exports = {
@@ -49,7 +50,7 @@ new AppleTouchIconsPlugin(
 
 module.exports = {
     plugins: [
-        new AppleTouchIconsPlugin()
+        new AppleTouchIconsPlugin({basepath: "absolute_path_to_assets"})
     ]
 }
 ```
